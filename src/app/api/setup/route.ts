@@ -1,11 +1,13 @@
 /**
  * POST /api/setup
  * One-time database setup — run after first Vercel deploy.
+ * 1. Runs prisma db push to create all tables
+ * 2. Seeds demo user, opportunities, recruiters, market insights
  * Protected by SETUP_SECRET env var.
- * Seeds demo user, opportunities, recruiters, market insights.
  */
 
 import { NextResponse } from "next/server";
+import { execSync } from "child_process";
 import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -20,10 +22,24 @@ export async function POST(req: Request) {
   }
 
   try {
-    // Check if already seeded
+    // ── STEP 1: Push schema (creates all tables) ─────────────
+    let schemaStatus = "skipped";
+    try {
+      execSync("npx prisma db push --skip-generate --accept-data-loss", {
+        env: { ...process.env },
+        timeout: 30000,
+        stdio: "pipe",
+      });
+      schemaStatus = "pushed";
+    } catch (e) {
+      // Tables may already exist — continue to seeding
+      schemaStatus = `warning: ${e instanceof Error ? e.message.slice(0, 100) : String(e)}`;
+    }
+
+    // ── STEP 2: Check if already seeded ─────────────────────
     const existing = await db.user.findUnique({ where: { id: "demo-user-001" } });
     if (existing) {
-      return NextResponse.json({ message: "Already seeded", skipped: true });
+      return NextResponse.json({ message: "Already seeded", skipped: true, schemaStatus });
     }
 
     // ── USER ─────────────────────────────────────────────
@@ -449,6 +465,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
+      schemaStatus,
       message: "✅ Career OS database seeded successfully",
       seeded: {
         user: 1,
