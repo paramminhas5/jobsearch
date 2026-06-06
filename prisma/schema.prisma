@@ -329,6 +329,73 @@ model WeeklyDigest {
 }
 
 // ─────────────────────────────────────────────
+// RECRUITER INTELLIGENCE
+// ─────────────────────────────────────────────
+
+model Recruiter {
+  id              String    @id @default(cuid())
+  // Identity
+  name            String
+  title           String?   // "Partner", "Managing Director", "Talent Lead"
+  firm            String    // "True Search", "a16z", "Riviera Partners"
+  firmType        String    // "exec-search", "vc-talent", "boutique", "independent", "staffing"
+  tier            String    @default("a") // "s" = must-contact, "a" = top priority, "b" = good, "c" = low
+
+  // Specialisation
+  rolesFocus      String    // JSON: ["CPO","Co-Founder","VP Product"]
+  stagesFocus     String    // JSON: ["seed","series-a","series-b"]
+  industriesFocus String    // JSON: ["AI","Fintech","Consumer","SaaS"]
+  geoFocus        String    // JSON: ["SF","NYC","Remote","London","Global"]
+
+  // Contact
+  email           String?
+  linkedinUrl     String?
+  twitterUrl      String?
+  website         String?
+  firmWebsite     String?
+
+  // How to approach
+  approachMethod  String    // "linkedin-dm", "email", "warm-intro", "apply-to-firm", "event"
+  approachScript  String    // Pre-written outreach message template
+  insiderNote     String?   // What they care about, hot buttons, relationship tips
+
+  // Relationship tracking (per user)
+  status          String    @default("not-contacted")
+  // "not-contacted" → "outreach-sent" → "replied" → "active-relationship" → "placed" → "dormant"
+  lastContactedAt DateTime?
+  nextFollowUp    DateTime?
+  notes           String?
+  rating          Int?      // 1–5 personal rating after interaction
+
+  // Meta
+  isActive        Boolean   @default(true)
+  placedRoles     String?   // JSON: notable placements e.g. ["CPO @ Stripe","VP Product @ OpenAI"]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  outreaches      RecruiterOutreach[]
+
+  @@map("recruiters")
+}
+
+model RecruiterOutreach {
+  id           String    @id @default(cuid())
+  recruiterId  String
+  userId       String
+  channel      String    // "linkedin", "email", "twitter", "referral"
+  message      String    // The actual message sent
+  sentAt       DateTime?
+  repliedAt    DateTime?
+  outcome      String?   // "positive", "negative", "no-reply", "intro-made"
+  notes        String?
+  createdAt    DateTime  @default(now())
+
+  recruiter    Recruiter @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+
+  @@map("recruiter_outreaches")
+}
+
+// ─────────────────────────────────────────────
 // SETTINGS
 // ─────────────────────────────────────────────
 

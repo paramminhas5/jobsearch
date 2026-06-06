@@ -13,15 +13,17 @@ import {
   Settings,
   Zap,
   ChevronRight,
+  Users,
 } from "lucide-react";
 
 const NAV_ITEMS = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/profile", label: "Profile", icon: User },
-  { href: "/opportunities", label: "Opportunities", icon: Telescope },
-  { href: "/pipeline", label: "Pipeline", icon: Kanban },
-  { href: "/brand", label: "Brand Engine", icon: Megaphone },
-  { href: "/growth", label: "Growth Loop", icon: TrendingUp },
+  { href: "/",            label: "Dashboard",    icon: LayoutDashboard },
+  { href: "/profile",     label: "Profile",      icon: User },
+  { href: "/opportunities",label: "Opportunities",icon: Telescope },
+  { href: "/pipeline",    label: "Pipeline",     icon: Kanban },
+  { href: "/recruiters",  label: "Recruiters",   icon: Users },
+  { href: "/brand",       label: "Brand Engine", icon: Megaphone },
+  { href: "/growth",      label: "Growth Loop",  icon: TrendingUp },
 ];
 
 export function SideNav() {

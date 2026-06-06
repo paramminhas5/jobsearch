@@ -4,13 +4,14 @@ import { usePathname } from "next/navigation";
 import { Bell, Search, Sparkles } from "lucide-react";
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
-  "/": { title: "Dashboard", subtitle: "Your career at a glance" },
-  "/profile": { title: "Profile Intelligence", subtitle: "Your source of truth" },
+  "/":              { title: "Dashboard",          subtitle: "Your career at a glance" },
+  "/profile":       { title: "Profile Intelligence",subtitle: "Your source of truth" },
   "/opportunities": { title: "Opportunity Engine", subtitle: "AI-ranked executive roles" },
-  "/pipeline": { title: "Pipeline", subtitle: "Track every application" },
-  "/brand": { title: "Brand Engine", subtitle: "Build your public signal" },
-  "/growth": { title: "Growth Loop", subtitle: "Close the gap to your dream role" },
-  "/settings": { title: "Settings", subtitle: "Connect your tools" },
+  "/pipeline":      { title: "Pipeline",           subtitle: "Track every application" },
+  "/recruiters":    { title: "Recruiter Network",  subtitle: "VC talent partners, exec search & more" },
+  "/brand":         { title: "Brand Engine",       subtitle: "Build your public signal" },
+  "/growth":        { title: "Growth Loop",        subtitle: "Close the gap to your dream role" },
+  "/settings":      { title: "Settings",           subtitle: "Connect your tools" },
 };
 
 export function TopBar() {
