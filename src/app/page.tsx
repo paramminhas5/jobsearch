@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { db } from "@/lib/db";
 import { DEMO_USER_ID, PIPELINE_STAGES } from "@/lib/constants";
 import { ScoreRing } from "@/components/ui/ScoreRing";

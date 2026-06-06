@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { db } from "@/lib/db";
 import { DEMO_USER_ID } from "@/lib/constants";
 import { cn, truncate } from "@/lib/utils";

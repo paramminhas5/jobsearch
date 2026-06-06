@@ -1,14 +1,13 @@
-// Career OS — Prisma Schema
-// Covers all 5 pillars: Profile Intelligence, Opportunity Engine,
-// Pipeline/Applications, Personal Brand Engine, Growth Loop
+// Career OS — Prisma Schema (PostgreSQL)
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ─────────────────────────────────────────────
@@ -20,33 +19,32 @@ model User {
   name              String?
   email             String?  @unique
   image             String?
-  headline          String?  // "CPO & Co-founder | Growth | VC-backed"
-  summary           String?  // 2–3 line bio
+  headline          String?
+  summary           String?
   location          String?
   linkedinUrl       String?
   githubUrl         String?
   websiteUrl        String?
-  targetRoles       String?  // JSON array: ["CPO","VP Product","Co-founder"]
-  targetIndustries  String?  // JSON array
+  targetRoles       String?
+  targetIndustries  String?
   targetSalaryMin   Int?
   targetSalaryMax   Int?
   openToRemote      Boolean  @default(true)
   openToRelocation  Boolean  @default(false)
-  profileScore      Int      @default(0) // 0–100 live score
+  profileScore      Int      @default(0)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  // Relations
-  experiences       Experience[]
-  educations        Education[]
-  skills            Skill[]
-  achievements      Achievement[]
-  opportunities     Opportunity[]
-  applications      Application[]
-  brandPosts        BrandPost[]
-  growthTasks       GrowthTask[]
-  connections       Connection[]
-  settings          Settings?
+  experiences  Experience[]
+  educations   Education[]
+  skills       Skill[]
+  achievements Achievement[]
+  opportunities Opportunity[]
+  applications Application[]
+  brandPosts   BrandPost[]
+  growthTasks  GrowthTask[]
+  connections  Connection[]
+  settings     Settings?
 
   @@map("users")
 }
@@ -61,62 +59,62 @@ model Experience {
   isCurrent   Boolean   @default(false)
   description String?
   location    String?
-  companySize String?   // "1–10", "11–50", "51–200", "201–1000", "1000+"
-  companyType String?   // "startup", "scaleup", "enterprise", "vc", "consulting"
+  companySize String?
+  companyType String?
   createdAt   DateTime  @default(now())
 
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   achievements Achievement[]
 
   @@map("experiences")
 }
 
 model Education {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   userId      String
   institution String
   degree      String?
   field       String?
   startYear   Int?
   endYear     Int?
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime @default(now())
 
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("educations")
 }
 
 model Skill {
-  id         String   @id @default(cuid())
-  userId     String
-  name       String
-  category   String   // "product", "growth", "technical", "leadership", "domain", "tool"
-  level      String   @default("intermediate") // "learning", "intermediate", "advanced", "expert"
-  yearsExp   Float?
-  inDemand   Boolean  @default(false) // flagged by market analysis
-  isGap      Boolean  @default(false) // flagged as a gap vs target roles
-  createdAt  DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  category  String
+  level     String   @default("intermediate")
+  yearsExp  Float?
+  inDemand  Boolean  @default(false)
+  isGap     Boolean  @default(false)
+  createdAt DateTime @default(now())
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("skills")
 }
 
 model Achievement {
-  id           String     @id @default(cuid())
+  id           String   @id @default(cuid())
   userId       String
   experienceId String?
   title        String
   description  String
-  metric       String?    // "Grew revenue 3x to $12M ARR"
-  impact       String?    // "company", "team", "product", "market"
-  category     String?    // "revenue", "growth", "product", "leadership", "fundraising"
+  metric       String?
+  impact       String?
+  category     String?
   year         Int?
-  isPublic     Boolean    @default(true)
-  createdAt    DateTime   @default(now())
+  isPublic     Boolean  @default(true)
+  createdAt    DateTime @default(now())
 
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  experience   Experience? @relation(fields: [experienceId], references: [id])
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  experience Experience? @relation(fields: [experienceId], references: [id])
 
   @@map("achievements")
 }
@@ -126,34 +124,34 @@ model Achievement {
 // ─────────────────────────────────────────────
 
 model Opportunity {
-  id               String    @id @default(cuid())
-  userId           String
-  title            String
-  company          String
-  companySize      String?
-  companyStage     String?   // "seed", "series-a", "series-b", "growth", "public", "pe"
-  companyWebsite   String?
-  location         String?
-  isRemote         Boolean   @default(false)
-  salaryMin        Int?
-  salaryMax        Int?
-  equityMin        Float?    // percentage
-  equityMax        Float?
-  description      String?
-  requirements     String?
-  sourceUrl        String?
-  sourcePlatform   String?   // "wellfound", "linkedin", "hacker-news", "exec-search", "vc-portfolio", "direct"
-  roleType         String?   // "cpo", "vp-product", "gm", "coo", "cmo", "co-founder", "consulting"
-  aiMatchScore     Int?      // 0–100
-  aiMatchReason    String?   // LLM explanation
-  aiSalaryEst      Int?      // estimated if not listed
-  status           String    @default("new") // "new", "saved", "dismissed", "applied"
-  discoveredAt     DateTime  @default(now())
-  expiresAt        DateTime?
-  isActive         Boolean   @default(true)
+  id             String    @id @default(cuid())
+  userId         String
+  title          String
+  company        String
+  companySize    String?
+  companyStage   String?
+  companyWebsite String?
+  location       String?
+  isRemote       Boolean   @default(false)
+  salaryMin      Int?
+  salaryMax      Int?
+  equityMin      Float?
+  equityMax      Float?
+  description    String?
+  requirements   String?
+  sourceUrl      String?
+  sourcePlatform String?
+  roleType       String?
+  aiMatchScore   Int?
+  aiMatchReason  String?
+  aiSalaryEst    Int?
+  status         String    @default("new")
+  discoveredAt   DateTime  @default(now())
+  expiresAt      DateTime?
+  isActive       Boolean   @default(true)
 
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  application      Application?
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  application Application?
 
   @@map("opportunities")
 }
@@ -163,56 +161,55 @@ model Opportunity {
 // ─────────────────────────────────────────────
 
 model Application {
-  id                String      @id @default(cuid())
-  userId            String
-  opportunityId     String      @unique
-  stage             String      @default("discovered")
-  // stages: discovered → applied → screen → interview_1 → interview_2 → final → offer → closed_won → closed_lost
-  appliedAt         DateTime?
-  resumeUsed        String?     // JSON snapshot of resume used
-  coverLetter       String?
-  notes             String?
-  nextActionDate    DateTime?
-  nextActionNote    String?
-  offerAmount       Int?
-  offerEquity       Float?
-  rejectionReason   String?
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
+  id              String    @id @default(cuid())
+  userId          String
+  opportunityId   String    @unique
+  stage           String    @default("discovered")
+  appliedAt       DateTime?
+  resumeUsed      String?
+  coverLetter     String?
+  notes           String?
+  nextActionDate  DateTime?
+  nextActionNote  String?
+  offerAmount     Int?
+  offerEquity     Float?
+  rejectionReason String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
-  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  opportunity       Opportunity @relation(fields: [opportunityId], references: [id])
-  events            ApplicationEvent[]
-  contacts          ApplicationContact[]
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunity Opportunity        @relation(fields: [opportunityId], references: [id])
+  events      ApplicationEvent[]
+  contacts    ApplicationContact[]
 
   @@map("applications")
 }
 
 model ApplicationEvent {
-  id            String      @id @default(cuid())
+  id            String   @id @default(cuid())
   applicationId String
-  type          String      // "stage_change", "note", "email_sent", "call", "interview"
+  type          String
   fromStage     String?
   toStage       String?
   note          String?
-  occurredAt    DateTime    @default(now())
+  occurredAt    DateTime @default(now())
 
-  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 
   @@map("application_events")
 }
 
 model ApplicationContact {
-  id            String      @id @default(cuid())
+  id            String  @id @default(cuid())
   applicationId String
   name          String
   title         String?
   email         String?
   linkedinUrl   String?
-  role          String?     // "hiring-manager", "recruiter", "champion", "interviewer"
+  role          String?
   notes         String?
 
-  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 
   @@map("application_contacts")
 }
@@ -222,56 +219,56 @@ model ApplicationContact {
 // ─────────────────────────────────────────────
 
 model BrandPost {
-  id             String    @id @default(cuid())
-  userId         String
-  platform       String    // "linkedin", "twitter", "substack", "medium", "blog"
-  contentType    String    // "thought-leadership", "win", "insight", "story", "thread"
-  topic          String?
-  draft          String    // AI-generated draft
-  finalContent   String?   // edited & published version
-  status         String    @default("draft") // "draft", "scheduled", "published"
-  publishedAt    DateTime?
-  scheduledFor   DateTime?
-  sourceAchievement String? // which achievement inspired this
-  engagementData String?   // JSON: {likes, comments, shares, impressions}
-  aiPromptUsed   String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id                String    @id @default(cuid())
+  userId            String
+  platform          String
+  contentType       String
+  topic             String?
+  draft             String
+  finalContent      String?
+  status            String    @default("draft")
+  publishedAt       DateTime?
+  scheduledFor      DateTime?
+  sourceAchievement String?
+  engagementData    String?
+  aiPromptUsed      String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("brand_posts")
 }
 
 model Connection {
-  id             String    @id @default(cuid())
-  userId         String
-  name           String
-  title          String?
-  company        String?
-  linkedinUrl    String?
-  email          String?
-  relationship   String?   // "strong", "warm", "cold", "target"
-  canIntroTo     String?   // JSON array of companies/roles they can intro to
+  id              String    @id @default(cuid())
+  userId          String
+  name            String
+  title           String?
+  company         String?
+  linkedinUrl     String?
+  email           String?
+  relationship    String?
+  canIntroTo      String?
   lastContactedAt DateTime?
-  notes          String?
-  createdAt      DateTime  @default(now())
+  notes           String?
+  createdAt       DateTime  @default(now())
 
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("connections")
 }
 
 model BrandMetric {
-  id                  String   @id @default(cuid())
-  userId              String
-  date                DateTime @default(now())
-  platform            String
-  followers           Int?
-  postCount           Int?
-  avgEngagementRate   Float?
-  profileViews        Int?
-  searchAppearances   Int?
+  id                String   @id @default(cuid())
+  userId            String
+  date              DateTime @default(now())
+  platform          String
+  followers         Int?
+  postCount         Int?
+  avgEngagementRate Float?
+  profileViews      Int?
+  searchAppearances Int?
 
   @@map("brand_metrics")
 }
@@ -281,49 +278,49 @@ model BrandMetric {
 // ─────────────────────────────────────────────
 
 model GrowthTask {
-  id           String    @id @default(cuid())
-  userId       String
-  category     String    // "skill", "credential", "project", "content", "network", "application"
-  title        String
-  description  String?
-  priority     String    @default("medium") // "high", "medium", "low"
-  status       String    @default("todo")   // "todo", "in_progress", "done", "skipped"
-  dueDate      DateTime?
-  completedAt  DateTime?
-  relatedSkill String?   // skill gap this addresses
-  relatedRole  String?   // target role this helps with
+  id             String    @id @default(cuid())
+  userId         String
+  category       String
+  title          String
+  description    String?
+  priority       String    @default("medium")
+  status         String    @default("todo")
+  dueDate        DateTime?
+  completedAt    DateTime?
+  relatedSkill   String?
+  relatedRole    String?
   estimatedHours Float?
-  resourceUrl  String?
-  createdAt    DateTime  @default(now())
+  resourceUrl    String?
+  createdAt      DateTime  @default(now())
 
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("growth_tasks")
 }
 
 model MarketInsight {
-  id          String   @id @default(cuid())
-  date        DateTime @default(now())
-  category    String   // "salary", "skill-demand", "role-trend", "industry"
-  title       String
-  body        String
-  source      String?
-  roleType    String?  // which role type this applies to
-  isActive    Boolean  @default(true)
+  id       String   @id @default(cuid())
+  date     DateTime @default(now())
+  category String
+  title    String
+  body     String
+  source   String?
+  roleType String?
+  isActive Boolean  @default(true)
 
   @@map("market_insights")
 }
 
 model WeeklyDigest {
-  id              String   @id @default(cuid())
-  userId          String
-  weekOf          DateTime
-  topMatches      String   // JSON array of opportunity IDs
-  growthTask      String?  // suggested task
-  marketInsight   String?
-  profileScore    Int?
-  emailSentAt     DateTime?
-  createdAt       DateTime @default(now())
+  id            String    @id @default(cuid())
+  userId        String
+  weekOf        DateTime
+  topMatches    String
+  growthTask    String?
+  marketInsight String?
+  profileScore  Int?
+  emailSentAt   DateTime?
+  createdAt     DateTime  @default(now())
 
   @@map("weekly_digests")
 }
@@ -334,63 +331,51 @@ model WeeklyDigest {
 
 model Recruiter {
   id              String    @id @default(cuid())
-  // Identity
   name            String
-  title           String?   // "Partner", "Managing Director", "Talent Lead"
-  firm            String    // "True Search", "a16z", "Riviera Partners"
-  firmType        String    // "exec-search", "vc-talent", "boutique", "independent", "staffing"
-  tier            String    @default("a") // "s" = must-contact, "a" = top priority, "b" = good, "c" = low
-
-  // Specialisation
-  rolesFocus      String    // JSON: ["CPO","Co-Founder","VP Product"]
-  stagesFocus     String    // JSON: ["seed","series-a","series-b"]
-  industriesFocus String    // JSON: ["AI","Fintech","Consumer","SaaS"]
-  geoFocus        String    // JSON: ["SF","NYC","Remote","London","Global"]
-
-  // Contact
+  title           String?
+  firm            String
+  firmType        String
+  tier            String    @default("a")
+  rolesFocus      String
+  stagesFocus     String
+  industriesFocus String
+  geoFocus        String
   email           String?
   linkedinUrl     String?
   twitterUrl      String?
   website         String?
   firmWebsite     String?
-
-  // How to approach
-  approachMethod  String    // "linkedin-dm", "email", "warm-intro", "apply-to-firm", "event"
-  approachScript  String    // Pre-written outreach message template
-  insiderNote     String?   // What they care about, hot buttons, relationship tips
-
-  // Relationship tracking (per user)
+  approachMethod  String
+  approachScript  String
+  insiderNote     String?
   status          String    @default("not-contacted")
-  // "not-contacted" → "outreach-sent" → "replied" → "active-relationship" → "placed" → "dormant"
   lastContactedAt DateTime?
   nextFollowUp    DateTime?
   notes           String?
-  rating          Int?      // 1–5 personal rating after interaction
-
-  // Meta
+  rating          Int?
   isActive        Boolean   @default(true)
-  placedRoles     String?   // JSON: notable placements e.g. ["CPO @ Stripe","VP Product @ OpenAI"]
+  placedRoles     String?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  outreaches      RecruiterOutreach[]
+  outreaches RecruiterOutreach[]
 
   @@map("recruiters")
 }
 
 model RecruiterOutreach {
-  id           String    @id @default(cuid())
-  recruiterId  String
-  userId       String
-  channel      String    // "linkedin", "email", "twitter", "referral"
-  message      String    // The actual message sent
-  sentAt       DateTime?
-  repliedAt    DateTime?
-  outcome      String?   // "positive", "negative", "no-reply", "intro-made"
-  notes        String?
-  createdAt    DateTime  @default(now())
+  id          String    @id @default(cuid())
+  recruiterId String
+  userId      String
+  channel     String
+  message     String
+  sentAt      DateTime?
+  repliedAt   DateTime?
+  outcome     String?
+  notes       String?
+  createdAt   DateTime  @default(now())
 
-  recruiter    Recruiter @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+  recruiter Recruiter @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
 
   @@map("recruiter_outreaches")
 }
@@ -407,12 +392,12 @@ model Settings {
   githubToken         String?
   emailNotifications  Boolean @default(true)
   weeklyDigestEmail   String?
-  digestDayOfWeek     Int     @default(1) // 0=Sun, 1=Mon...
+  digestDayOfWeek     Int     @default(1)
   autoApply           Boolean @default(false)
   autoGenerateContent Boolean @default(true)
   theme               String  @default("dark")
 
-  user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("settings")
 }

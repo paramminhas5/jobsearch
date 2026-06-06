@@ -12,8 +12,14 @@
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
-    "db:seed": "tsx prisma/seed.ts",
-    "db:seed-recruiters": "tsx prisma/seed-recruiters.ts"
+    "db:migrate": "prisma migrate deploy",
+    "db:seed": "tsx prisma/seed.ts && tsx prisma/seed-recruiters.ts",
+    "db:seed:demo": "tsx prisma/seed.ts",
+    "db:seed:recruiters": "tsx prisma/seed-recruiters.ts",
+    "db:setup": "prisma db push && tsx prisma/seed.ts && tsx prisma/seed-recruiters.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "6.1.0",
