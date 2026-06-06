@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: "Inter", system-ui, sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-ink-950 text-slate-100 font-sans;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(99, 102, 241, 0.04) 0%, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-ink-900;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-ink-600 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-accent;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-ink-800 border border-ink-600 rounded-2xl shadow-card;
+  }
+
+  .card-hover {
+    @apply card transition-all duration-200 hover:border-accent/40 hover:shadow-glow cursor-pointer;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-accent {
+    @apply badge bg-accent/15 text-accent-glow border border-accent/20;
+  }
+
+  .badge-green {
+    @apply badge bg-signal-green/10 text-signal-green border border-signal-green/20;
+  }
+
+  .badge-amber {
+    @apply badge bg-signal-amber/10 text-signal-amber border border-signal-amber/20;
+  }
+
+  .badge-red {
+    @apply badge bg-signal-red/10 text-signal-red border border-signal-red/20;
+  }
+
+  .badge-slate {
+    @apply badge bg-slate-700/50 text-slate-300 border border-slate-600/30;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-xl font-medium text-sm transition-all duration-150 shadow-glow;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-ink-700 hover:bg-ink-600 text-slate-200 rounded-xl font-medium text-sm transition-all duration-150 border border-ink-600;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-3 py-1.5 text-slate-400 hover:text-slate-100 hover:bg-ink-700 rounded-lg text-sm transition-all duration-150;
+  }
+
+  .input {
+    @apply w-full bg-ink-700 border border-ink-600 rounded-xl px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all duration-150;
+  }
+
+  .label {
+    @apply block text-xs font-medium text-slate-400 mb-1.5;
+  }
+
+  .section-title {
+    @apply text-lg font-semibold text-slate-100 tracking-tight;
+  }
+
+  .stat-card {
+    @apply card p-5 flex flex-col gap-2;
+  }
+
+  .score-ring {
+    @apply relative inline-flex items-center justify-center;
+  }
+
+  .nav-link {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-ink-700 transition-all duration-150;
+  }
+
+  .nav-link-active {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-accent/10 text-accent-soft border border-accent/20;
+  }
+
+  .glow-dot {
+    @apply w-2 h-2 rounded-full animate-pulse;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-accent-soft to-accent-glow bg-clip-text text-transparent;
+  }
+
+  .border-gradient {
+    border-image: linear-gradient(135deg, rgba(99,102,241,0.4), rgba(165,180,252,0.1)) 1;
+  }
+
+  .glass {
+    @apply bg-ink-800/60 backdrop-blur-xl border border-ink-600/60;
+  }
+
+  .progress-bar {
+    @apply h-1.5 rounded-full bg-ink-600 overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full rounded-full transition-all duration-700 ease-out;
+  }
+}
